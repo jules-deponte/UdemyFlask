@@ -23,5 +23,6 @@ student = Student('alice', (77,88,99))
 print(student.name)
 print(student.grades)
 print(student.avg_grades())
+
 alice = Student('alice', (1,2,3))
 print(alice.avg_grades())
