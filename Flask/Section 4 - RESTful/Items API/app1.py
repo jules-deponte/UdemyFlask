@@ -24,6 +24,7 @@ class Item(Resource):
         item = next(filter(lambda item: item['name'] == name, items), None)
         return {'message': item}, 200 if item is not None else 404
     
+    @jwt_required()
     def post(self, name):
         if next(filter(lambda item: item['name'] == name, items), None):
             return {'message':f'An item with name {name} already exists.'}, 400
