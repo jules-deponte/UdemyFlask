@@ -9,3 +9,7 @@ def identity(payload):
     user_id = payload['identity']
     print(payload)
     return User.find_by_id(user_id)
+
+def new_user(username, password):
+    User.new_user(1,1, username, password)
+    return

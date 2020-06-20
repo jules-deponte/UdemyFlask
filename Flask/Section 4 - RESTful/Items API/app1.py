@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
 
-from security import authenticate, identity
+from security import authenticate, identity, new_user
 
 app = Flask(__name__)
 app.secret_key = 'DouglasDaleDouglas'
@@ -60,8 +60,18 @@ class Item(Resource):
             item.update(request_data)
             return {'message':'Item updated'}
 
+class Signup(Resource):
+    def post(self):
+        request_data = request.get_json()
+        username = request_data['username']
+        password = request_data['password']
+        new_user(username, password)
+        return {'message':'User created'}
+
+
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
+api.add_resource(Signup, '/signup')
 
 app.run(port=5000, debug=True)

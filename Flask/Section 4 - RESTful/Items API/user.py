@@ -39,3 +39,13 @@ class User:
 
         connection.close()
         return user
+
+    def new_user(self, _id, username, password):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        insert_query = "INSERT INTO users (username, password) VALUES (?, ?)"
+        cursor.execute(insert_query, (username, password))
+
+        connection.commit()
+        connection.close()
