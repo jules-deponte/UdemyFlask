@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
@@ -16,26 +17,48 @@ items = []
 
 class ItemList(Resource):
     def get(self):
-        if items == []:
-            return {"items": None}, 404
-        return {'items':items}, 200
+        pass
 
 class Item(Resource):
-    @jwt_required()
-    def get(self, name):
-        item = next(filter(lambda item: item['name'] == name, items), None)
-        return {'message': item}, 200 if item is not None else 404
+    # @jwt_required()
+    @classmethod
+    def get(cls, name):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        item_query = "SELECT item, price FROM items WHERE item = ?"
+        result = cursor.execute(item_query, (name,))
+        row = result.fetchone()
+        
+        if row:
+            item, price = row    
+            connection.close()    
+            return {'item':item, 'price':price}, 201
+        else:
+            connection.close()
+            return {'message':'Item does not exist'}, 404
+                
+        
+
+        
     
-    @jwt_required()
-    def post(self, name):
-        if next(filter(lambda item: item['name'] == name, items), None):
-            return {'message':f'An item with name {name} already exists.'}, 400
+    # @jwt_required()
+    def post(cls, name):
+        if cls.get(name)[1] == 201:
+            return {'message':'This item already exists.'}
 
         request_data = request.get_json()
         price = request_data['price']
         item = {'name':name, 'price':price}
-        items.append(item)
-        return item, 201
+        
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        post_item = "INSERT INTO items (item, price) VALUES (?, ?)"
+        cursor.execute(post_item, (name, price))
+        connection.commit()
+
+        return item, 201, connection.close()
 
     def delete(self, name):
         global items
