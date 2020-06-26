@@ -1,32 +1,21 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
+from flask_jwt import JWT, jwt_required
+
+from user import User, Signup
+
+from security import authenticate, identity, new_user
+
+import items
 
 app = Flask(__name__)
+app.secret_key = 'DouglasDaleDouglas'
 api = Api(app)
 
-items = []
+jwt = JWT(app, authenticate, identity) # /auth
 
-class ItemList(Resource):
-    def get(self):
-        if items == []:
-            return {"items": None}, 404
-        return {'items':items}, 200
-
-class Item(Resource):
-    def get(self, name):
-        for item in items:
-            if item['name'] == name:
-                return item 
-        return {'message': 'Item not found'}, 404
-    
-    def post(self, name):
-        request_data = request.get_json()
-        price = request_data['price']
-        item = {'name':name, 'price':price}
-        items.append(item)
-        return item, 201
-
-api.add_resource(Item, '/item/<string:name>')
-api.add_resource(ItemList, '/items')
+api.add_resource(items.Item, '/item/<string:name>')
+api.add_resource(items.ItemList, '/items')
+api.add_resource(Signup, '/signup')
 
 app.run(port=5000, debug=True)
