@@ -20,8 +20,9 @@ class ItemList(Resource):
         pass
 
 class Item(Resource):
-    # @jwt_required()
+
     @classmethod
+    @jwt_required()    
     def get(cls, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
@@ -42,7 +43,7 @@ class Item(Resource):
 
         
     
-    # @jwt_required()
+    @jwt_required()
     def post(cls, name):
         if cls.get(name)[1] == 201:
             return {'message':'This item already exists.'}
