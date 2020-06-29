@@ -38,11 +38,7 @@ class Item(Resource):
         else:
             connection.close()
             return {'message':'Item does not exist'}, 404
-                
-        
-
-        
-    
+                    
     @jwt_required()
     def post(cls, name):
         if cls.get(name)[1] == 201:
@@ -58,8 +54,9 @@ class Item(Resource):
         post_item = "INSERT INTO items (item, price) VALUES (?, ?)"
         cursor.execute(post_item, (name, price))
         connection.commit()
-
-        return item, 201, connection.close()
+        connection.close()
+        
+        return item, 201
 
     def delete(self, name):
         global items
